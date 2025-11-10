@@ -1,0 +1,175 @@
+class Movie:
+    
+    def __init__(self, title="", genre="", duration=0, rating=0.0, ticket_price=0.0):
+        self.__title = title         
+        self.__genre = genre          
+        self.__duration = duration    
+        self.__rating = rating       
+        self.__ticket_price = ticket_price 
+    
+    def get_title(self):
+        return self.__title
+    
+    def get_genre(self):
+        return self.__genre
+    
+    def get_duration(self):
+        return self.__duration
+    
+    def get_rating(self):
+        return self.__rating
+    
+    def get_ticket_price(self):
+        return self.__ticket_price
+    
+    def set_title(self, title):
+        self.__title = title
+    
+    def set_genre(self, genre):
+        self.__genre = genre
+    
+    def set_duration(self, duration):
+        self.__duration = duration
+    
+    def set_rating(self, rating):
+        if 0 <= rating <= 10:
+            self.__rating = rating
+    
+    def set_ticket_price(self, price):
+        if price >= 0:
+            self.__ticket_price = price
+
+    def show_info(self):
+        print(f"Фильм: {self.__title}")
+        print(f"Жанр: {self.__genre}, Длительность: {self.__duration} мин")
+        print(f"Рейтинг: {self.__rating}/10, Цена билета: {self.__ticket_price} руб.")
+    
+    def calculate_discount_price(self, discount_percent):
+        discount = self.__ticket_price * discount_percent / 100
+        return self.__ticket_price - discount
+    
+    def get_movie_category(self):
+        if self.__rating >= 8.5:
+            return "Высокий рейтинг"
+        elif self.__rating >= 7.0:
+            return "Средний рейтинг"
+        else:
+            return "Низкий рейтинг"
+
+
+class CinemaHall:
+    
+    def __init__(self, hall_number=0, capacity=0, hall_type="2D"):
+        self.__hall_number = hall_number   
+        self.__capacity = capacity          
+        self.__hall_type = hall_type       
+        self.__available_seats = capacity   
+    
+    def get_hall_number(self):
+        return self.__hall_number
+    
+    def get_capacity(self):
+        return self.__capacity
+    
+    def get_hall_type(self):
+        return self.__hall_type
+    
+    def get_available_seats(self):
+        return self.__available_seats
+    
+    def set_hall_number(self, number):
+        self.__hall_number = number
+    
+    def set_capacity(self, capacity):
+        self.__capacity = capacity
+        self.__available_seats = capacity
+    
+    def set_hall_type(self, hall_type):
+        self.__hall_type = hall_type
+    
+    def show_hall_info(self):
+        print(f"Зал №{self.__hall_number}, Тип: {self.__hall_type}")
+        print(f"Вместимость: {self.__capacity} мест, Свободно: {self.__available_seats}")
+    
+    def reserve_seats(self, seats_count):
+        if seats_count <= self.__available_seats:
+            self.__available_seats -= seats_count
+            return True
+        return False
+    
+    def get_occupancy_percentage(self):
+        occupied = self.__capacity - self.__available_seats
+        return (occupied / self.__capacity) * 100
+
+
+class MovieSession(Movie):
+    
+    def __init__(self, title="", genre="", duration=0, rating=0.0, ticket_price=0.0, start_time="", hall=None):
+        super().__init__(title, genre, duration, rating, ticket_price)
+        self.__start_time = start_time     
+        self.__hall = hall                  
+        self.__sold_tickets = 0             
+    
+    def get_start_time(self):
+        return self.__start_time
+    
+    def get_hall(self):
+        return self.__hall
+    
+    def get_sold_tickets(self):
+        return self.__sold_tickets
+    
+    def set_start_time(self, time):
+        self.__start_time = time
+    
+    def set_hall(self, hall):
+        self.__hall = hall
+    
+    def show_session_info(self):
+        print(f"Сеанс: {self.get_title()} в {self.__start_time}")
+        print(f"Зал: №{self.__hall.get_hall_number()}, Тип: {self.__hall.get_hall_type()}")
+        print(f"Свободных мест: {self.__hall.get_available_seats()}")
+        print(f"Цена билета: {self.get_ticket_price()} руб.")
+    
+    def sell_tickets(self, tickets_count):
+        if self.__hall.reserve_seats(tickets_count):
+            self.__sold_tickets += tickets_count
+            total_cost = tickets_count * self.get_ticket_price()
+            return total_cost
+        return 0
+    
+    def calculate_revenue(self):
+        return self.__sold_tickets * self.get_ticket_price()
+
+
+
+def demo_cinema_system():
+    print("=== ДЕМОНСТРАЦИЯ РАБОТЫ СИСТЕМЫ КИНОТЕАТРА ===\n")
+    
+
+    movie1 = Movie("Интерстеллар", "Фантастика", 169, 8.6, 450.0)
+    hall1 = CinemaHall(1, 100, "IMAX")
+    session1 = MovieSession("Интерстеллар", "Фантастика", 169, 8.6, 550.0, "18:30", hall1)
+    
+    print("1. Информация о фильме:")
+    movie1.show_info()
+    print(f"Категория: {movie1.get_movie_category()}")
+    print(f"Цена со скидкой 20%: {movie1.calculate_discount_price(20)} руб.\n")
+    
+    print("2. Информация о зале:")
+    hall1.show_hall_info()
+    print(f"Заполненность: {hall1.get_occupancy_percentage():.1f}%\n")
+    
+    print("3. Информация о сеансе:")
+    session1.show_session_info()
+    
+    print("\n4. Продажа билетов:")
+    revenue = session1.sell_tickets(5)
+    print(f"Продано 5 билетов. Выручка: {revenue} руб.")
+    
+    print("\n5. Обновленная информация:")
+    session1.show_session_info()
+    print(f"Общая выручка с сеанса: {session1.calculate_revenue()} руб.")
+
+if __name__ == "__main__":
+    demo_cinema_system()
